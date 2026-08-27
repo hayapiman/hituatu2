@@ -1,0 +1,195 @@
+body {
+
+    font-family: sans-serif;
+
+    text-align: center;
+
+    background: #f4f4f4;
+
+    margin: 0;
+
+    padding: 20px;
+
+}
+
+
+/* =========================
+   キャリブレーション
+========================= */
+
+#calibration {
+
+    width: 900px;
+
+    max-width: 95%;
+
+    margin: 20px auto;
+
+    background: white;
+
+    padding: 20px;
+
+    border-radius: 10px;
+
+    box-sizing: border-box;
+
+}
+
+
+#calibrationInstruction {
+
+    font-size: 20px;
+
+}
+
+
+#calibrationPressure {
+
+    font-weight: bold;
+
+}
+
+
+#calibrationCanvas {
+
+    background: white;
+
+    border: 3px solid black;
+
+    cursor: crosshair;
+
+    touch-action: none;
+
+    display: block;
+
+    margin: 20px auto;
+
+    max-width: 100%;
+
+}
+
+
+/* =========================
+   実験画面
+========================= */
+
+#experimentArea {
+
+    display: none;
+
+}
+
+
+#question {
+
+    width: 900px;
+
+    max-width: 95%;
+
+    margin: auto;
+
+    background: white;
+
+    padding: 20px;
+
+    margin-bottom: 20px;
+
+    border-radius: 10px;
+
+    box-sizing: border-box;
+
+}
+
+
+#info {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 25px;
+
+    margin-bottom: 20px;
+
+    font-size: 16px;
+
+}
+
+
+#info p {
+
+    margin: 5px;
+
+}
+
+
+#canvas {
+
+    background: white;
+
+    border: 3px solid black;
+
+    cursor: crosshair;
+
+    touch-action: none;
+
+    display: block;
+
+    margin: auto;
+
+    max-width: 95%;
+
+}
+
+
+/* =========================
+   ボタン
+========================= */
+
+button {
+
+    margin: 10px;
+
+    padding: 10px 25px;
+
+    font-size: 17px;
+
+    cursor: pointer;
+
+}
+
+
+/* =========================
+   スマートフォン・iPad対応
+========================= */
+
+@media (max-width: 950px) {
+
+    #question,
+    #calibration {
+
+        width: 95%;
+
+    }
+
+    #canvas {
+
+        width: 95%;
+
+        height: auto;
+
+    }
+
+    #calibrationCanvas {
+
+        width: 95%;
+
+        height: auto;
+
+    }
+
+}

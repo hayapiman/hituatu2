@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>筆圧計測実験</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<h1>筆圧計測実験</h1>
+
+
+<!-- =========================
+     キャリブレーション画面
+========================= -->
+
+<div id="calibration">
+
+    <h2 id="calibrationTitle">筆圧キャリブレーション</h2>
+
+    <p id="calibrationInstruction">
+        できるだけ強い力で線を書いてください。
+    </p>
+
+    <p>
+        キャリブレーション筆圧：
+        <span id="calibrationPressure">0</span>
+    </p>
+
+    <canvas
+        id="calibrationCanvas"
+        width="900"
+        height="300">
+    </canvas>
+
+    <button id="calibrationClear">
+        書き直す
+    </button>
+
+    <button id="calibrationNext">
+        次へ
+    </button>
+
+</div>
+
+
+<!-- =========================
+     実験画面
+========================= -->
+
+<div id="experimentArea">
+
+    <div id="question">
+
+        <h2>問題</h2>
+
+        <p id="questionText"></p>
+
+    </div>
+
+
+    <div id="info">
+
+        <p>
+            筆圧：
+            <span id="pressure">0</span>
+        </p>
+
+        <p>
+            正規化筆圧：
+            <span id="normalizedPressure">0</span> %
+        </p>
+
+        <p>
+            筆圧変動：
+            <span id="pressureChange">0</span>
+        </p>
+
+        <p>
+            速度：
+            <span id="speed">0</span> px/s
+        </p>
+
+        <p>
+            加速度：
+            <span id="acceleration">0</span> px/s²
+        </p>
+
+        <p>
+            停止時間：
+            <span id="stopTime">0</span> 秒
+        </p>
+
+    </div>
+
+
+    <canvas
+        id="canvas"
+        width="900"
+        height="400">
+    </canvas>
+
+
+    <div>
+
+        <button id="clear">
+            リセット
+        </button>
+
+        <button id="submit">
+            回答確定
+        </button>
+
+    </div>
+
+
+    <div>
+
+        <button id="download">
+            CSV保存
+        </button>
+
+        <button id="downloadSummary">
+            集計CSV保存
+        </button>
+
+    </div>
+
+</div>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>
