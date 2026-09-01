@@ -1356,17 +1356,14 @@ function downloadCSV() {
 
                 d.buttons + "," +
 
-                d.penDown +
-
-                "\n";
+                d.penDown + "\n";
 
         }
     );
 
-
-    const blob =
-        new Blob(
-            [csv],
+    const bom = "\uFEFF";
+    const blob = new Blob(
+            [bom +csv],
             {
                 type:
                     "text/csv;charset=utf-8;"
