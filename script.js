@@ -1012,270 +1012,139 @@ document
    回答確定
 ========================================================= */
 
-document
-    .getElementById("submit")
-    .onclick = () => {
+document.getElementById("submit").onclick = () => {
 
+    console.log("回答確定ボタンが押されました");
 
-        const questionNumber =
-            currentQuestion + 1;
+    // 現在の問題のデータだけ取得
+    const currentData = experimentData.filter(
+        d => d.question === currentQuestion + 1
+    );
 
+    // データがない場合
+    if (currentData.length === 0) {
 
-        const currentData =
-            experimentData.filter(
-                d =>
-                    d.question ===
-                    questionNumber
-            );
+        alert("まだ描画データがありません。");
 
+        return;
+    }
 
-        if (
-            currentData.length === 0
-        ) {
+    // 平均筆圧
+    const avgPressure =
+        currentData.reduce(
+            (sum, d) => sum + d.pressure, 0
+        ) / currentData.length;
 
-            alert(
-                "まず問題を解いてください。"
-            );
-
-            return;
-
-        }
-
-
-        /* -----------------------------------------
-           平均筆圧
-        ----------------------------------------- */
-
-        const avgPressure =
-            currentData.reduce(
-                (sum, d) =>
-                    sum + d.pressure,
-                0
-            )
-            /
-            currentData.length;
-
-
-        /* -----------------------------------------
-           最大筆圧
-        ----------------------------------------- */
-
-        const maxPressure =
-            Math.max(
-                ...currentData.map(
-                    d => d.pressure
-                )
-            );
-
-
-        /* -----------------------------------------
-           平均正規化筆圧
-        ----------------------------------------- */
-
-        const avgNormalizedPressure =
-            currentData.reduce(
-                (sum, d) =>
-                    sum +
-                    d.normalizedPressure,
-                0
-            )
-            /
-            currentData.length;
-
-
-        /* -----------------------------------------
-           筆圧標準偏差
-        ----------------------------------------- */
-
-        const pressureVariance =
-            currentData.reduce(
-                (sum, d) =>
-                    sum +
-                    Math.pow(
-                        d.normalizedPressure -
-                        avgNormalizedPressure,
-                        2
-                    ),
-                0
-            )
-            /
-            currentData.length;
-
-
-        const pressureStd =
-            Math.sqrt(
-                pressureVariance
-            );
-
-
-        /* -----------------------------------------
-           筆圧変動幅
-        ----------------------------------------- */
-
-        const pressureValues =
-            currentData.map(
-                d =>
-                    d.normalizedPressure
-            );
-
-
-        const pressureRange =
-            Math.max(
-                ...pressureValues
-            )
-            -
-            Math.min(
-                ...pressureValues
-            );
-
-
-        /* -----------------------------------------
-           平均速度
-        ----------------------------------------- */
-
-        const avgSpeed =
-            currentData.reduce(
-                (sum, d) =>
-                    sum + d.speed,
-                0
-            )
-            /
-            currentData.length;
-
-
-        /* -----------------------------------------
-           平均加速度
-        ----------------------------------------- */
-
-        const avgAcceleration =
-            currentData.reduce(
-                (sum, d) =>
-                    sum + d.acceleration,
-                0
-            )
-            /
-            currentData.length;
-
-
-        /* -----------------------------------------
-           回答時間
-        ----------------------------------------- */
-
-        const answerTime =
-            performance.now() -
-            experimentStart;
-
-
-        /* -----------------------------------------
-           集計データ
-        ----------------------------------------- */
-
-    summaryData.push({
-
-    question: currentQuestion + 1,
-
-    questionText: questionOrder[currentQuestion],
-
-    answerTime: answerTime,
-
-    averagePressure: avgPressure,
-
-    maximumPressure: maxPressure,
-
-    averageSpeed: avgSpeed,
-
-    averageAcceleration: avgAcceleration,
-
-    totalStopTime: totalStop,
-
-    interruptCount: interruptCount
-
-});   
-
-
-        /* -----------------------------------------
-           描画だけリセット
-        ----------------------------------------- */
-
-        ctx.clearRect(
-            0,
-            0,
-            canvas.width,
-            canvas.height
+    // 最大筆圧
+    const maxPressure =
+        Math.max(
+            ...currentData.map(d => d.pressure)
         );
 
+    // 平均速度
+    const avgSpeed =
+        currentData.reduce(
+            (sum, d) => sum + d.speed, 0
+        ) / currentData.length;
 
-        pressureText.innerHTML =
-            "0";
+    // 平均加速度
+    const avgAcceleration =
+        currentData.reduce(
+            (sum, d) => sum + d.acceleration, 0
+        ) / currentData.length;
 
+    // 停止時間
+    const totalStop =
+        currentData.reduce(
+            (sum, d) => sum + d.stopTime, 0
+        );
 
-        normalizedPressureText.innerHTML =
-            "0";
+    // 妨害イベントは現在使用していないので0
+    const interruptCount = 0;
 
+    // 回答時間
+    const answerTime =
+        performance.now() - experimentStart;
 
-        pressureChangeText.innerHTML =
-            "0";
+    // 集計データを保存
+    summaryData.push({
 
+        question: currentQuestion + 1,
 
-        speedText.innerHTML =
-            "0";
+        answerTime: answerTime,
 
+        averagePressure: avgPressure,
 
-        accelerationText.innerHTML =
-            "0";
+        maximumPressure: maxPressure,
 
+        averageSpeed: avgSpeed,
 
-        stopText.innerHTML =
-            "0";
+        averageAcceleration: avgAcceleration,
 
+        totalStopTime: totalStop,
 
-        stopStart =
-            null;
+        interruptCount: interruptCount
 
+    });
 
-        lastSpeed =
-            0;
+    console.log("集計データ:", summaryData);
 
+    // -------------------------
+    // 描画だけリセット
+    // -------------------------
 
-        lastPressure =
-            0;
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
 
+    // 表示を0に戻す
+    pressureText.innerHTML = "0";
 
-        lastSampleTime =
-            0;
+    speedText.innerHTML = "0";
 
+    accelerationText.innerHTML = "0";
 
-        /* -----------------------------------------
-           次の問題
-        ----------------------------------------- */
+    stopText.innerHTML = "0";
 
-        currentQuestion++;
+    // -------------------------
+    // 次の問題へ
+    // -------------------------
 
+    currentQuestion++;
 
-        if (
-            currentQuestion <
-            questionOrder.length
-        ) {
+    if (currentQuestion < questionOrder.length) {
 
-            questionText.innerHTML =
-                questionOrder[
-                    currentQuestion
-                ];
+        questionText.innerHTML =
+            questionOrder[currentQuestion];
 
+        // 次の問題の計測開始
+        experimentStart = performance.now();
 
-            experimentStart =
-                performance.now();
+        // 初期値もリセット
+        lastSpeed = 0;
+        lastTime = performance.now();
+        stopStart = null;
 
-        }
-        else {
+        console.log(
+            "次の問題:",
+            questionOrder[currentQuestion]
+        );
 
-            alert(
-                "実験終了です。CSVを保存してください。"
-            );
+    } else {
 
-        }
+        alert("全ての問題が終了しました。");
 
-    };
+        console.log(
+            "最終集計データ:",
+            summaryData
+        );
+
+    }
+
+};
 
 
 /* =========================================================
