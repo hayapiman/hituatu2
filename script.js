@@ -924,19 +924,15 @@ canvas.addEventListener(
 
         drawing = false;
 
-
         if (
             canvas.hasPointerCapture(
                 e.pointerId
             )
         ) {
-
             canvas.releasePointerCapture(
                 e.pointerId
             );
-
         }
-
     }
 );
 
@@ -1174,41 +1170,27 @@ document
            集計データ
         ----------------------------------------- */
 
-        summaryData.push({
+    summaryData.push({
 
-            question:
-                questionNumber,
+    question: currentQuestion + 1,
 
-            questionText:
-                questionOrder[
-                    currentQuestion
-                ],
+    questionText: questionOrder[currentQuestion],
 
-            answerTime:
-                answerTime,
+    answerTime: answerTime,
 
-            averagePressure:
-                avgPressure,
+    averagePressure: avgPressure,
 
-            maximumPressure:
-                maxPressure,
+    maximumPressure: maxPressure,
 
-            averageNormalizedPressure:
-                avgNormalizedPressure,
+    averageSpeed: avgSpeed,
 
-            pressureStd:
-                pressureStd,
+    averageAcceleration: avgAcceleration,
 
-            pressureRange:
-                pressureRange,
+    totalStopTime: totalStop,
 
-            averageSpeed:
-                avgSpeed,
+    interruptCount: interruptCount
 
-            averageAcceleration:
-                avgAcceleration
-
-        });
+});   
 
 
         /* -----------------------------------------
@@ -1302,7 +1284,7 @@ document
 
 function downloadCSV() {
 
-    let csv =
+    let csv = "\uFEFF";
         "Participant," +
         "Question," +
         "QuestionText," +
@@ -1371,25 +1353,16 @@ function downloadCSV() {
         );
 
 
-    const url =
-        URL.createObjectURL(blob);
+    const url = URL.createObjectURL(blob);
 
-
-    const a =
-        document.createElement("a");
-
+    const a = document.createElement("a");
 
     a.href = url;
-
-    a.download =
-        "experiment.csv";
-
+    a.download = "experiment.csv";
 
     a.click();
 
-
     URL.revokeObjectURL(url);
-
 }
 
 
@@ -1397,96 +1370,51 @@ function downloadCSV() {
    集計CSV
 ========================================================= */
 
-function downloadSummaryCSV() {
+function downloadSummaryCSV(){
 
-    let csv =
+    let csv = "\uFEFF";
 
-        "Question," +
-        "QuestionText," +
-        "AnswerTime," +
-        "AveragePressure," +
-        "MaximumPressure," +
-        "AverageNormalizedPressure," +
-        "PressureStd," +
-        "PressureRange," +
-        "AverageSpeed," +
-        "AverageAcceleration\n";
+    // ヘッダー
+    csv +=
+        "Question,QuestionText,AnswerTime,AveragePressure,MaximumPressure,AverageNormalizedPressure,PressureStability,AverageSpeed,AverageAcceleration\n";
 
+    summaryData.forEach(d => {
 
-    summaryData.forEach(
-        d => {
+        csv +=
+            d.question + "," +
+            "\"" + d.questionText.replace(/"/g, '""') + "\"," +
+            d.answerTime + "," +
+            d.averagePressure + "," +
+            d.maximumPressure + "," +
+            d.averageNormalizedPressure + "," +
+            d.pressureStability + "," +
+            d.averageSpeed + "," +
+            d.averageAcceleration + "\n";
 
-            csv +=
+    });
 
-                d.question + "," +
-
-                `"${d.questionText}",` +
-
-                d.answerTime + "," +
-
-                d.averagePressure + "," +
-
-                d.maximumPressure + "," +
-
-                d.averageNormalizedPressure + "," +
-
-                d.pressureStd + "," +
-
-                d.pressureRange + "," +
-
-                d.averageSpeed + "," +
-
-                d.averageAcceleration +
-
-                "\n";
-
-        }
+    const blob = new Blob(
+        [csv],
+        { type: "text/csv;charset=utf-8;" }
     );
 
+    const url = URL.createObjectURL(blob);
 
-    const blob =
-        new Blob(
-            [csv],
-            {
-                type:
-                    "text/csv;charset=utf-8;"
-            }
-        );
-
-
-    const url =
-        URL.createObjectURL(blob);
-
-
-    const a =
-        document.createElement("a");
-
+    const a = document.createElement("a");
 
     a.href = url;
 
-    a.download =
-        "experiment_summary.csv";
+    a.download = "experiment_summary.csv";
 
+    document.body.appendChild(a);
 
     a.click();
 
+    document.body.removeChild(a);
 
     URL.revokeObjectURL(url);
-
 }
 
+document.getElementById("download").onclick = downloadCSV;
 
-/* =========================================================
-   CSVボタン
-========================================================= */
-
-document
-    .getElementById("download")
-    .onclick =
-    downloadCSV;
-
-
-document
-    .getElementById("downloadSummary")
-    .onclick =
-    downloadSummaryCSV;
+document.getElementById("downloadSummary").onclick = downloadSummaryCSV;
