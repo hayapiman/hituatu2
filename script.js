@@ -586,9 +586,9 @@ function normalizePressure(
    メインCanvas：筆圧開始
 ========================================================= */
 
-canvas.addEventListener(
-    "pointerdown",
-    (e) => {
+canvas.addEventListener("pointerdown", (e) => {
+
+        e.preventDefault();
 
         drawing = true;
 
@@ -627,9 +627,9 @@ canvas.addEventListener(
    メインCanvas：筆圧取得
 ========================================================= */
 
-canvas.addEventListener(
-    "pointermove",
-    (e) => {
+canvas.addEventListener( "pointermove",(e) => {
+
+        e.preventDefault();
 
         if (!drawing) return;
 
@@ -918,10 +918,10 @@ canvas.addEventListener(
    筆を離した
 ========================================================= */
 
-canvas.addEventListener(
-    "pointerup",
-    (e) => {
+canvas.addEventListener("pointerup",(e) => {
 
+        e.preventDefault();
+        
         drawing = false;
 
         if (

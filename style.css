@@ -193,3 +193,17 @@ button {
     }
 
 }
+
+/* Apple Pencilによる文字選択を防止 */
+body {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* 描画領域 */
+canvas {
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
