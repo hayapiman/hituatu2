@@ -1059,6 +1059,14 @@ document.getElementById("submit").onclick = () => {
             (sum, d) => sum + d.stopTime, 0
         );
 
+    const avgNormalizedPressure =
+    currentData.reduce((sum, d) => sum + d.normalizedPressure, 0)
+    / currentData.length;
+
+    const pressureStability =
+    currentData.reduce((sum, d) => sum + Math.abs(d.pressureChange), 0)
+    / currentData.length;
+
     // 妨害イベントは現在使用していないので0
     const interruptCount = 0;
 
@@ -1070,6 +1078,8 @@ document.getElementById("submit").onclick = () => {
     summaryData.push({
 
         question: currentQuestion + 1,
+
+        questionText: questionOrder[currentQuestion],
 
         answerTime: answerTime,
 
