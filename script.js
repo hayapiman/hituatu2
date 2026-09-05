@@ -152,6 +152,8 @@ let lastSpeed = 0;
 
 let lastPressure = 0;
 
+let lastNormalizedPressure = 0;
+
 let stopStart = null;
 
 
@@ -164,7 +166,7 @@ let stopStart = null;
     = 約13.33ms
 */
 
-const SAMPLE_INTERVAL = 1000 / 75;
+const SAMPLE_INTERVAL = 1000 / 60;
 
 let lastSampleTime = 0;
 
@@ -491,10 +493,6 @@ calibrationNext.onclick = () => {
         summaryData = [];
 
 
-        experimentStart =
-            performance.now();
-
-
         lastSampleTime = 0;
 
         lastPressure = 0;
@@ -761,6 +759,8 @@ canvas.addEventListener( "pointermove",(e) => {
             e.pressure -
             lastPressure;
 
+        const normalizedPressureChange =
+            normalizedPressure - lastNormalizedPressure;
 
         /* -----------------------------------------
            停止時間
@@ -859,6 +859,9 @@ canvas.addEventListener( "pointermove",(e) => {
             y:
                 e.offsetY,
 
+            normalizedPressureChange:
+                normalizedPressureChange,
+
             pressure:
                 e.pressure,
 
@@ -901,6 +904,8 @@ canvas.addEventListener( "pointermove",(e) => {
         lastPressure =
             e.pressure;
 
+        lastNormalizedPressure = normalizedPressure;
+
         lastX =
             e.offsetX;
 
@@ -921,7 +926,7 @@ canvas.addEventListener( "pointermove",(e) => {
 canvas.addEventListener("pointerup",(e) => {
 
         e.preventDefault();
-        
+
         drawing = false;
 
         if (
@@ -1021,6 +1026,19 @@ document.getElementById("submit").onclick = () => {
         d => d.question === currentQuestion + 1
     );
 
+    const changeData = currentData.filter(
+    d => d.normalizedPressureChange !== null
+);
+
+const pressureVariability =
+    changeData.length > 0
+        ? changeData.reduce(
+            (sum, d) =>
+                sum + Math.abs(d.normalizedPressureChange),
+            0
+        ) / changeData.length
+        : 0;
+
     // データがない場合
     if (currentData.length === 0) {
 
@@ -1093,7 +1111,7 @@ document.getElementById("submit").onclick = () => {
 
         totalStopTime: totalStop,
 
-        interruptCount: interruptCount
+        interruptCount: interruptCount,
 
     });
 
@@ -1164,6 +1182,8 @@ document.getElementById("submit").onclick = () => {
 function downloadCSV() {
 
     let csv = "\uFEFF";
+
+    csv +=
         "Participant," +
         "Question," +
         "QuestionText," +
