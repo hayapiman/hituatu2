@@ -265,28 +265,54 @@ function normalizePressure(pressure) {
    Canvas座標取得
 ========================================================= */
 
-function getCanvasPosition(e) {
+let canvasRect = null;
+let canvasScaleX = 1;
+let canvasScaleY = 1;
 
-    const rect =
+
+function updateCanvasMetrics() {
+
+    canvasRect =
         canvas.getBoundingClientRect();
 
-    const scaleX =
-        canvas.width / rect.width;
+    canvasScaleX =
+        canvas.width /
+        canvasRect.width;
 
-    const scaleY =
-        canvas.height / rect.height;
+    canvasScaleY =
+        canvas.height /
+        canvasRect.height;
+
+}
+
+
+function getCanvasPosition(e) {
+
+    if (canvasRect === null) {
+
+        updateCanvasMetrics();
+
+    }
+
 
     return {
 
         x:
-            (e.clientX - rect.left) * scaleX,
+            (e.clientX - canvasRect.left)
+            * canvasScaleX,
 
         y:
-            (e.clientY - rect.top) * scaleY
+            (e.clientY - canvasRect.top)
+            * canvasScaleY
 
     };
 
 }
+
+window.addEventListener(
+    "resize",
+    updateCanvasMetrics
+);
 
 
 /* =========================================================
@@ -649,6 +675,7 @@ calibrationNext.onclick = () => {
         experimentArea.style.display =
             "block";
 
+        updateCanvasMetrics();
 
         shuffleQuestions();
 
@@ -714,11 +741,14 @@ function resetMeasurementVariables() {
 
     stopStart = null;
 
-    drawX = 0;
+    drawQueue.length = 0;
 
-    drawY = 0;
+    drawFramePending = false;
 
-    hasDrawPoint = false;
+    previousDrawX = 0;
+    previousDrawY = 0;
+
+    hasPreviousDrawPoint = false;
 
 
     pressureText.textContent =
@@ -746,75 +776,125 @@ function resetMeasurementVariables() {
    Canvas描画設定
 ========================================================= */
 
-ctx.lineCap =
-    "round";
-
-ctx.lineJoin =
-    "round";
-
-ctx.strokeStyle =
-    "black";
+ctx.lineCap = "round";
+ctx.lineJoin = "round";
+ctx.strokeStyle = "black";
+ctx.lineWidth = 3;
 
 
 /* =========================================================
-   Canvas描画
-=========================================================
-
-   pointermoveでは直接strokeしない。
-
-   requestAnimationFrameで描画することで
-   Apple Pencil入力と描画処理を分離する。
-
+   描画キュー
 ========================================================= */
 
-function drawCanvasPoint(x, y) {
+let drawQueue = [];
 
-    if (!hasDrawPoint) {
+let drawFramePending = false;
 
-        ctx.beginPath();
+let previousDrawX = 0;
+let previousDrawY = 0;
 
-        ctx.moveTo(
-            x,
-            y
-        );
+let hasPreviousDrawPoint = false;
 
-        drawX = x;
 
-        drawY = y;
+/* =========================================================
+   描画をキューに追加
+========================================================= */
 
-        hasDrawPoint = true;
+function queueCanvasPoint(x, y) {
 
+    drawQueue.push({
+        x: x,
+        y: y
+    });
+
+
+    if (drawFramePending) {
         return;
+    }
 
+
+    drawFramePending = true;
+
+    requestAnimationFrame(
+        drawCanvasFrame
+    );
+
+}
+
+
+/* =========================================================
+   requestAnimationFrameで描画
+========================================================= */
+
+function drawCanvasFrame() {
+
+    drawFramePending = false;
+
+
+    if (drawQueue.length === 0) {
+        return;
     }
 
 
     ctx.beginPath();
 
-    ctx.moveTo(
-        drawX,
-        drawY
-    );
-
-    ctx.lineTo(
-        x,
-        y
-    );
 
     /*
-        描画の線幅は固定。
-
-        筆圧そのものは
-        experimentDataへ保存する。
+       初回
     */
 
-    ctx.lineWidth = 3;
+    if (!hasPreviousDrawPoint) {
+
+        const first =
+            drawQueue.shift();
+
+        previousDrawX =
+            first.x;
+
+        previousDrawY =
+            first.y;
+
+        hasPreviousDrawPoint =
+            true;
+
+    }
+
+
+    /*
+       前回位置から
+       今回の点までまとめて描画
+    */
+
+    ctx.moveTo(
+        previousDrawX,
+        previousDrawY
+    );
+
+
+    while (
+        drawQueue.length > 0
+    ) {
+
+        const point =
+            drawQueue.shift();
+
+
+        ctx.lineTo(
+            point.x,
+            point.y
+        );
+
+
+        previousDrawX =
+            point.x;
+
+        previousDrawY =
+            point.y;
+
+    }
+
 
     ctx.stroke();
-
-    drawX = x;
-
-    drawY = y;
 
 }
 
@@ -891,7 +971,7 @@ canvas.addEventListener(
             最初の点を即座に描画
         */
 
-        drawCanvasPoint(
+        queueCanvasPoint(
             pos.x,
             pos.y
         );
@@ -935,7 +1015,7 @@ canvas.addEventListener(
             ------------------------------------------------
         */
 
-        drawCanvasPoint(
+        queueCanvasPoint(
             pos.x,
             pos.y
         );
@@ -1363,8 +1443,11 @@ document
     lastSampleTime =
         0;
 
-    hasDrawPoint =
-        false;
+    hasPreviousDrawPoint =false;
+
+    drawQueue.length =0;
+
+    drawFramePending =false;
 
 };
 
