@@ -196,8 +196,9 @@ button {
 
 /* Apple Pencilによる文字選択を防止 */
 body {
-    -webkit-user-select: none;
     user-select: none;
+    -webkit-user-select: none;
+    
 }
 
 /* 描画領域 */

@@ -584,41 +584,44 @@ function normalizePressure(
    メインCanvas：筆圧開始
 ========================================================= */
 
+canvas.addEventListener("pointercancel", (e) => {
+    drawing = false;
+
+    if (canvas.hasPointerCapture(e.pointerId)) {
+        canvas.releasePointerCapture(e.pointerId);
+    }
+});
+
+canvas.addEventListener("lostpointercapture", () => {
+    drawing = false;
+});
+
 canvas.addEventListener("pointerdown", (e) => {
 
         e.preventDefault();
 
         drawing = true;
 
-        canvas.setPointerCapture(
-            e.pointerId
-        );
+        canvas.setPointerCapture(e.pointerId);
 
 
         ctx.beginPath();
-
-        ctx.moveTo(
-            e.offsetX,
-            e.offsetY
-        );
+        ctx.moveTo(e.offsetX,e.offsetY);
 
 
-        lastX =
-            e.offsetX;
+        lastX =e.offsetX;
 
-        lastY =
-            e.offsetY;
+        lastY =e.offsetY;
 
-        lastTime =
-            performance.now();
+        lastTime =performance.now();
 
         lastSpeed = 0;
 
-        lastPressure =
-            e.pressure;
+        lastPressure =e.pressure;
+        lastNormalizedPressure =normalizePressure(e.pressure);
+        lastSampleTime = performance. now(); 
 
-    }
-);
+    });
 
 
 /* =========================================================
