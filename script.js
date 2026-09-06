@@ -788,12 +788,15 @@ ctx.lineWidth = 3;
    描画キュー
 ========================================================= */
 
-let drawQueue = [];
+/*let drawQueue = [];
+let drawFramePending = false;*/
 
-let drawFramePending = false;
+/*let previousDrawX = 0;
+let previousDrawY = 0;*/
 
-let previousDrawX = 0;
-let previousDrawY = 0;
+let previousDrawX = null;
+let previousDrawY = null;
+
 
 
 /* =========================================================
@@ -802,23 +805,23 @@ let previousDrawY = 0;
 
 function queueCanvasPoint(x, y) {
 
-    drawQueue.push({
-        x: x,
-        y: y
-    });
-
-
-    if (drawFramePending) {
+    // 最初の1点
+    if (!hasPreviousDrawPoint) {
+        previousDrawX = x;
+        previousDrawY = y;
+        hasPreviousDrawPoint = true;
         return;
     }
 
+    // 前回の位置から今回の位置まで線を描く
+    ctx.beginPath();
+    ctx.moveTo(previousDrawX, previousDrawY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
 
-    drawFramePending = true;
-
-    requestAnimationFrame(
-        drawCanvasFrame
-    );
-
+    // 今回の位置を次回の始点にする
+    previousDrawX = x;
+    previousDrawY = y;
 }
 
 
@@ -826,7 +829,7 @@ function queueCanvasPoint(x, y) {
    requestAnimationFrameで描画
 ========================================================= */
 
-function drawCanvasFrame() {
+/*function drawCanvasFrame() {
 
     drawFramePending = false;
 
@@ -839,9 +842,6 @@ function drawCanvasFrame() {
     ctx.beginPath();
 
 
-    /*
-       初回
-    */
 
     if (!hasPreviousDrawPoint) {
 
@@ -860,10 +860,6 @@ function drawCanvasFrame() {
     }
 
 
-    /*
-       前回位置から
-       今回の点までまとめて描画
-    */
 
     ctx.moveTo(
         previousDrawX,
@@ -896,7 +892,7 @@ function drawCanvasFrame() {
 
     ctx.stroke();
 
-}
+}*/
 
 
 /* =========================================================
@@ -984,18 +980,11 @@ canvas.addEventListener(
    メインCanvas：筆圧取得
 ========================================================= */
 
-canvas.addEventListener(
-    "pointermove",
-    (e) => {
+canvas.addEventListener("pointermove",(e) => {
 
         if (!drawing) return;
 
-        if (
-            e.pointerType !== "pen"
-        ) {
-
-            return;
-
+        if (e.pointerType !== "pen") {return;
         }
 
         e.preventDefault();
@@ -1015,10 +1004,7 @@ canvas.addEventListener(
             ------------------------------------------------
         */
 
-        queueCanvasPoint(
-            pos.x,
-            pos.y
-        );
+        queueCanvasPoint(pos.x, pos.y);
 
 
         /*
