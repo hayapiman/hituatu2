@@ -743,14 +743,8 @@ function resetMeasurementVariables() {
 
     hasPreviousDrawPoint =false;
 
-    drawQueue.length = 0;
-
-    drawFramePending = false;
-
-    previousDrawX = 0;
-    previousDrawY = 0;
-
-    hasPreviousDrawPoint = false;
+    previousDrawX = null;
+    previousDrawY = null;
 
 
     pressureText.textContent =
@@ -923,7 +917,12 @@ canvas.addEventListener(
 
 
         const pos =
-            getCanvasPosition(e);
+           getCanvasPosition(e);
+        
+        previousDrawX = null;
+        previousDrawY = null;
+        hasPreviousDrawPoint = false;
+
 
 
         lastX =
@@ -1293,11 +1292,8 @@ function finishDrawing(e) {
 
     drawing = false;
     hasPreviousDrawPoint = false;
-
-    /*
-        停止中だった場合
-        最後の停止時間を確定
-    */
+    previousDrawX = null;
+    previousDrawY = null;
 
     if (
         stopStart !== null
@@ -1358,14 +1354,14 @@ canvas.addEventListener(
 );
 
 
-canvas.addEventListener(
+/*canvas.addEventListener(
     "lostpointercapture",
     () => {
 
         drawing = false;
 
     }
-);
+);*/
 
 
 /* =========================================================
@@ -1431,9 +1427,8 @@ document
 
     hasPreviousDrawPoint =false;
 
-    drawQueue.length =0;
-
-    drawFramePending =false;
+    previousDrawX = null;
+    previousDrawY = null;
 
 };
 
