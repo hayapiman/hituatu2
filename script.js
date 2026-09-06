@@ -272,16 +272,13 @@ let canvasScaleY = 1;
 
 function updateCanvasMetrics() {
 
-    canvasRect =
-        canvas.getBoundingClientRect();
+    canvasRect = canvas.getBoundingClientRect();
 
     canvasScaleX =
-        canvas.width /
-        canvasRect.width;
+        canvas.width / canvas.clientWidth;
 
     canvasScaleY =
-        canvas.height /
-        canvasRect.height;
+        canvas.height / canvas.clientHeight;
 
 }
 
@@ -291,11 +288,15 @@ function getCanvasPosition(e) {
     return {
 
         x:
-            (e.clientX - canvasRect.left) *
+            (e.clientX -
+             canvasRect.left -
+             canvas.clientLeft) *
             canvasScaleX,
 
         y:
-            (e.clientY - canvasRect.top) *
+            (e.clientY -
+             canvasRect.top -
+             canvas.clientTop) *
             canvasScaleY
 
     };
