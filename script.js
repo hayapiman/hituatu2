@@ -196,7 +196,7 @@ let drawX = 0;
 
 let drawY = 0;
 
-let hasDrawPoint = false;
+let hasPreviousDrawPoint = false;
 
 
 /* =========================================================
@@ -741,6 +741,8 @@ function resetMeasurementVariables() {
 
     stopStart = null;
 
+    hasPreviousDrawPoint =false;
+
     drawQueue.length = 0;
 
     drawFramePending = false;
@@ -963,7 +965,7 @@ canvas.addEventListener(
             null;
 
 
-        hasDrawPoint =
+        hasPreviousDrawPoint =
             false;
 
 
@@ -1306,7 +1308,7 @@ canvas.addEventListener(
 function finishDrawing(e) {
 
     drawing = false;
-
+    hasPreviousDrawPoint = false;
 
     /*
         停止中だった場合
