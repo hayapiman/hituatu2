@@ -795,8 +795,6 @@ let drawFramePending = false;
 let previousDrawX = 0;
 let previousDrawY = 0;
 
-let hasPreviousDrawPoint = false;
-
 
 /* =========================================================
    描画をキューに追加
@@ -2129,5 +2127,3 @@ document
     .getElementById("downloadSummary")
     .onclick =
     downloadSummaryCSV;
-
-    //hayato
