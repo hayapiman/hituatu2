@@ -288,22 +288,22 @@ function updateCanvasMetrics() {
 
 function getCanvasPosition(e) {
 
-    if (canvasRect === null) {
+    const rect =
+        canvas.getBoundingClientRect();
 
-        updateCanvasMetrics();
+    const scaleX =
+        canvas.width / rect.width;
 
-    }
-
+    const scaleY =
+        canvas.height / rect.height;
 
     return {
 
         x:
-            (e.clientX - canvasRect.left)
-            * canvasScaleX,
+            (e.clientX - rect.left) * scaleX,
 
         y:
-            (e.clientY - canvasRect.top)
-            * canvasScaleY
+            (e.clientY - rect.top) * scaleY
 
     };
 
