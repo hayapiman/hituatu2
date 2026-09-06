@@ -166,7 +166,7 @@ let stopStart = null;
     = 約13.33ms
 */
 
-const SAMPLE_INTERVAL = 1000 / 60;
+const SAMPLE_INTERVAL = 1000 / 75;
 
 let lastSampleTime = 0;
 
@@ -667,7 +667,7 @@ canvas.addEventListener( "pointermove",(e) => {
 
 
         /* -----------------------------------------
-           75Hzサンプリング
+           60Hzサンプリング
         ----------------------------------------- */
 
         if (
@@ -1148,8 +1148,8 @@ const pressureVariability =
         questionText.innerHTML =
             questionOrder[currentQuestion];
 
-        // 次の問題の計測開始
-        experimentStart = performance.now();
+        //次の問題の計測開始
+        //experimentStart = performance.now();
 
         // 初期値もリセット
         lastSpeed = 0;
