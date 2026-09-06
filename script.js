@@ -88,8 +88,8 @@ const canvas =
 
 const ctx =
     canvas.getContext("2d", {
-        alpha: false
-    });
+        alpha: false,
+        desynchronized: true});
 
 const pressureText =
     document.getElementById("pressure");
@@ -288,22 +288,15 @@ function updateCanvasMetrics() {
 
 function getCanvasPosition(e) {
 
-    const rect =
-        canvas.getBoundingClientRect();
-
-    const scaleX =
-        canvas.width / rect.width;
-
-    const scaleY =
-        canvas.height / rect.height;
-
     return {
 
         x:
-            (e.clientX - rect.left) * scaleX,
+            (e.clientX - canvasRect.left) *
+            canvasScaleX,
 
         y:
-            (e.clientY - rect.top) * scaleY
+            (e.clientY - canvasRect.top) *
+            canvasScaleY
 
     };
 
@@ -313,6 +306,8 @@ window.addEventListener(
     "resize",
     updateCanvasMetrics
 );
+
+updateCanvasMetrics();
 
 
 /* =========================================================
