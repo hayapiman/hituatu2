@@ -896,14 +896,15 @@ canvas.addEventListener(
         e.preventDefault();
 
         if (
-            e.pointerType !== "pen"
+            e.pointerType !== "pen"&&
+            e.pointerType !== "touch"
         ) {
 
             return;
 
         }
 
-
+        updateCanvasMetrics();
         drawing = true;
 
 
@@ -979,7 +980,9 @@ canvas.addEventListener("pointermove",(e) => {
 
         if (!drawing) return;
 
-        if (e.pointerType !== "pen") {return;
+        if (e.pointerType !== "pen"&&
+            e.pointerType !== "touch"
+        ) {return;
         }
 
         e.preventDefault();
@@ -1356,6 +1359,10 @@ canvas.addEventListener(
 
     }
 );
+
+canvas.addEventListener("pointerleave", (e) => {
+    finishDrawing(e);
+});
 
 
 /*canvas.addEventListener(
