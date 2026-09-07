@@ -103,7 +103,7 @@ body {
 
 #info {
 
-    display: flex;
+    display: none;
 
     justify-content: center;
 

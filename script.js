@@ -36,7 +36,7 @@ let currentQuestion = 0;
    問題をランダム化
 ========================================================= */
 
-/*function shuffleQuestions() {
+function shuffleQuestions() {
 
     questionOrder = [...questions];
 
@@ -60,7 +60,7 @@ let currentQuestion = 0;
 
     }
 
-}*/
+}
 
 
 /* =========================================================
@@ -684,7 +684,7 @@ calibrationNext.onclick = () => {
 
         updateCanvasMetrics();
 
-        shuffleQuestions();
+        /*shuffleQuestions();*/
 
         currentQuestion = 0;
 
