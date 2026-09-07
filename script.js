@@ -999,7 +999,15 @@ canvas.addEventListener("pointermove",(e) => {
             ------------------------------------------------
         */
 
-        queueCanvasPoint(pos.x, pos.y);
+        const coalesced =
+            (typeof e.getCoalescedEvents === "function" && e.getCoalescedEvents().length)
+                ? e.getCoalescedEvents()
+                : [e];
+
+        for (const ev of coalesced) {
+            const p = getCanvasPosition(ev);
+            queueCanvasPoint(p.x, p.y);
+        }
 
 
         /*
