@@ -27,7 +27,7 @@ const questions = [
 
 ];
 
-let questionOrder = [];
+let questionOrder = [...questions];
 
 let currentQuestion = 0;
 
