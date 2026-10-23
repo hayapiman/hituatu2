@@ -685,8 +685,7 @@ calibrationNext.onclick = () => {
         updateCanvasMetrics();
         
        questionOrder = [...questions];
-
-　　　　currentQuestion = 0;
+       currentQuestion = 0;
 
 
 
