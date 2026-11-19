@@ -61,9 +61,10 @@ let lastDisplayTime = 0;
 function elapsed(t) { return t - questionStart; }
 function nowMs() { return performance.now(); }
 function normalizePressure(p) {
-  if (maximumPressure <= normalPressure) return 0;
-  return Math.max(0, Math.min(100,
-    (p - normalPressure) / (maximumPressure - normalPressure) * 100));
+  // 通常筆圧を0、最大筆圧を100とする。通常以下は負、最大超は100超を保持する。
+  // キャリブレーションが無効な場合は0と区別するためNaNを返す。
+  if (maximumPressure <= normalPressure) return NaN;
+  return (p - normalPressure) / (maximumPressure - normalPressure) * 100;
 }
 function position(e, target) {
   const r = target.getBoundingClientRect();
