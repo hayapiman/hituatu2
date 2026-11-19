@@ -233,6 +233,7 @@ function appendSample(e, t) {
   // 0.5秒以上イベントが来なかった区間を接触中の推定停止として保存。
   // 実際の思考停止ではなく、ブラウザのイベント欠落を含み得る。
   if (lastSampleTime !== null && dtMs >= STOP_THRESHOLD_MS) {
+    lowSpeedStart = null;
     closeStop(lastSampleTime, "previous_stop");
     stopStart = lastSampleTime;
     recordEvent("stop_start", stopStart, { reason: "sample_gap" });
@@ -321,7 +322,7 @@ function finishStroke(e, type) {
     recordEvent("stop_start", stopStart, { reason: "stroke_end_gap" });
     closeStop(t, "stroke_end_gap");
   }
-  if (lowSpeedStart !== null && t - lowSpeedStart >= STOP_THRESHOLD_MS) {
+  if (lowSpeedStart !== null && t - lowSpeedStart >= STOP_THRESHOLD_MS && stopStart === null) {
     stopStart = lowSpeedStart;
     recordEvent("stop_start", stopStart, { reason: "low_speed" });
     closeStop(t, "stroke_end");
@@ -410,17 +411,6 @@ $("submit").addEventListener("click", () => {
 function escapeCSV(value) {
   if (value === null || value === undefined) return "";
   return '"' + String(value).replace(/"/g, '""') + '"';
-}
-function downloadRows(filename, rows, columns) {
-  const csv = "\uFEFF" + columns.join(",") + "\n" +
-    rows.map(row => columns.map(([header, key]) => escapeCSV(row[key])).join(",")).join("\n");
-  // columns are [header,key] pairs
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url; a.download = filename;
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 function exportCSV(filename, rows, keys) {
   if (!rows.length) { alert("保存するデータがありません。"); return; }
