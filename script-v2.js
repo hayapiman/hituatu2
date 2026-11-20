@@ -390,7 +390,7 @@ function finalizeAnswer(isUnknown) {
     unknownTime: isUnknown ? t - questionStart : null,
     hasWriting: firstDownTime !== null,
     answerTime: t - questionStart,
-    writingStartTime: firstDownTime - questionStart,
+    writingStartTime: firstDownTime === null ? null : firstDownTime - questionStart,
     writingEndToSubmitTime: lastUpTime === null ? null : t - lastUpTime,
     firstDownTime, lastUpTime, submitTime: t,
     averagePressure: samples.length ? avg(d => d.pressure) : null,
@@ -422,7 +422,7 @@ function finalizeAnswer(isUnknown) {
     $("clear").disabled = true;
     alert("全問終了しました。詳細・イベント・停止区間・集計CSVを保存してください。");
   }
-});
+}
 function escapeCSV(value) {
   if (value === null || value === undefined) return "";
   return '"' + String(value).replace(/"/g, '""') + '"';
