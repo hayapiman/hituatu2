@@ -34,7 +34,7 @@ let currentQuestion = 0;
 let orderMode = "sequential";
 let questionStart = 0;
 let experimentEnded = false;
-let calibrationMode = "maximum";
+let calibrationMode = "normal";
 let maximumPressure = 0;
 let normalPressure = 0;
 let calibrationPressures = [];
@@ -152,12 +152,12 @@ function startExperiment() {
   summaryData = [];
   $("setup").hidden = true;
   $("calibration").hidden = false;
-  calibrationMode = "maximum";
+  calibrationMode = "normal";
   calibrationPressures = [];
   maximumPressure = 0;
   normalPressure = 0;
-  $("calibrationTitle").textContent = "最大筆圧キャリブレーション";
-  $("calibrationInstruction").textContent = "できるだけ強い力で線を書いてください。";
+  $("calibrationTitle").textContent = "通常筆圧キャリブレーション";
+  $("calibrationInstruction").textContent = "普段通りの力で、名前を書いてください。";
 }
 $("startExperiment").addEventListener("click", startExperiment);
 
@@ -199,20 +199,21 @@ $("calibrationClear").addEventListener("click", () => {
   else normalPressure = 0;
 });
 $("calibrationNext").addEventListener("click", () => {
-  if (calibrationMode === "maximum") {
-    if (maximumPressure <= 0) { alert("ペンで線を書いてください。"); return; }
-    calibrationMode = "normal";
+  if (calibrationMode === "normal") {
+    if (!calibrationPressures.length) { alert("ペンで名前を書いてください。"); return; }
+    normalPressure = calibrationPressures.reduce((a, b) => a + b, 0) /
+      calibrationPressures.length;
+    calibrationMode = "maximum";
     calibrationPressures = [];
-    $("calibrationTitle").textContent = "通常筆圧キャリブレーション";
-    $("calibrationInstruction").textContent = "普段通りの力で線を書いてください。";
+    $("calibrationTitle").textContent = "最大筆圧キャリブレーション";
+    $("calibrationInstruction").textContent = "できるだけ強い力で線を書いてください。";
     calibrationCtx.clearRect(0, 0, calibrationCanvas.width, calibrationCanvas.height);
+    $("calibrationPressure").textContent = "0";
     return;
   }
-  if (!calibrationPressures.length) { alert("ペンで線を書いてください。"); return; }
-  normalPressure = calibrationPressures.reduce((a, b) => a + b, 0) /
-    calibrationPressures.length;
+  if (maximumPressure <= 0) { alert("ペンで線を書いてください。"); return; }
   if (normalPressure >= maximumPressure) {
-    alert("通常筆圧が最大筆圧以上です。キャリブレーションをやり直してください。");
+    alert("最大筆圧が通常筆圧以下です。最大筆圧を測り直してください。");
     return;
   }
   $("calibration").hidden = true;
