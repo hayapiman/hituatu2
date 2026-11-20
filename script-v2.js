@@ -360,8 +360,17 @@ $("submit").addEventListener("click", () => {
   if (experimentEnded) return;
   if (drawing) { alert("ペンを離してから確定してください。"); return; }
   if (firstDownTime === null) { alert("ペンで解答を書いてください。"); return; }
+  finalizeAnswer(false);
+});
+$("unknown").addEventListener("click", () => {
+  if (experimentEnded) return;
+  if (drawing) { alert("ペンを離してから操作してください。"); return; }
+  if (firstDownTime !== null) { alert("一度でも筆記した場合は「回答確定」を押してください。"); return; }
+  finalizeAnswer(true);
+});
+function finalizeAnswer(isUnknown) {
   const t = nowMs();
-  recordEvent("submit", t);
+  recordEvent(isUnknown ? "unknown" : "submit", t);
   const samples = experimentData.filter(d => d.question === currentQuestion + 1);
   const stops = stopData.filter(d => d.question === currentQuestion + 1);
   const events = eventData.filter(d => d.question === currentQuestion + 1);
@@ -377,17 +386,20 @@ $("submit").addEventListener("click", () => {
     if (prev) airTimes.push(downs[i].time - prev.time);
   }
   summaryData.push({
-    ...questionMeta(), answerTime: t - questionStart,
+    ...questionMeta(), answerStatus: isUnknown ? "unknown" : "submitted",
+    unknownTime: isUnknown ? t - questionStart : null,
+    hasWriting: firstDownTime !== null,
+    answerTime: t - questionStart,
     writingStartTime: firstDownTime - questionStart,
     writingEndToSubmitTime: lastUpTime === null ? null : t - lastUpTime,
     firstDownTime, lastUpTime, submitTime: t,
-    averagePressure: avg(d => d.pressure),
-    maximumPressure: max(d => d.pressure),
-    averageNormalizedPressure: avg(d => d.normalizedPressure),
-    maximumNormalizedPressure: max(d => d.normalizedPressure),
-    pressureStability: absChange,
-    averageSpeed: avg(d => d.speed),
-    averageAcceleration: avg(d => d.acceleration),
+    averagePressure: samples.length ? avg(d => d.pressure) : null,
+    maximumPressure: samples.length ? max(d => d.pressure) : null,
+    averageNormalizedPressure: samples.length ? avg(d => d.normalizedPressure) : null,
+    maximumNormalizedPressure: samples.length ? max(d => d.normalizedPressure) : null,
+    pressureStability: samples.length ? absChange : null,
+    averageSpeed: samples.length ? avg(d => d.speed) : null,
+    averageAcceleration: samples.length ? avg(d => d.acceleration) : null,
     totalStopTime: stops.reduce((s, d) => s + d.durationMs, 0),
     stopCount: stops.length,
     penLiftCount: Math.max(0, downs.length - 1),
@@ -403,11 +415,12 @@ $("submit").addEventListener("click", () => {
   if (currentQuestion < questionOrder.length) displayQuestion();
   else {
     experimentEnded = true;
-    $("questionText").textContent = "実験終了。CSVを3種類保存してください。";
+    $("questionText").textContent = "実験終了。CSVを4種類保存してください。";
     $("questionProgress").textContent = "終了";
     $("submit").disabled = true;
+    $("unknown").disabled = true;
     $("clear").disabled = true;
-    alert("全問終了しました。詳細・イベント・集計CSVを保存してください。");
+    alert("全問終了しました。詳細・イベント・停止区間・集計CSVを保存してください。");
   }
 });
 function escapeCSV(value) {
@@ -436,7 +449,7 @@ const stopKeys = ["participant","question","questionId","questionText","orderMod
   "strokeId","stopType","startTime","endTime","startElapsedTime",
   "endElapsedTime","durationMs","reason"];
 const summaryKeys = ["participant","question","questionId","questionText","orderMode",
-  "answerTime","writingStartTime","writingEndToSubmitTime","firstDownTime",
+  "answerStatus","unknownTime","hasWriting","answerTime","writingStartTime","writingEndToSubmitTime","firstDownTime",
   "lastUpTime","submitTime","averagePressure","maximumPressure",
   "averageNormalizedPressure","maximumNormalizedPressure","pressureStability",
   "averageSpeed","averageAcceleration","totalStopTime","stopCount","penLiftCount",
