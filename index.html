@@ -21,8 +21,8 @@
   <button id="startExperiment">実験を開始</button>
 </section>
 <section id="calibration" hidden>
-  <h2 id="calibrationTitle">最大筆圧キャリブレーション</h2>
-  <p id="calibrationInstruction">できるだけ強い力で線を書いてください。</p>
+  <h2 id="calibrationTitle">通常筆圧キャリブレーション</h2>
+  <p id="calibrationInstruction">普段通りの力で、名前を書いてください。</p>
   <p>キャリブレーション筆圧：<span id="calibrationPressure">0</span></p>
   <canvas id="calibrationCanvas" width="900" height="300"></canvas>
   <button id="calibrationClear">書き直す</button>
@@ -41,8 +41,9 @@
     <p>加速度：<span id="acceleration">0</span> px/s²</p>
     <p>停止時間：<span id="stopTime">0</span> 秒</p>
   </div>
+  <p>一部だけわかる場合は、わかる範囲で書いて「回答確定」を押してください。何も書けない場合のみ「分からない」を押してください。</p>
   <canvas id="canvas" width="900" height="400"></canvas>
-  <div><button id="clear">書き直す</button><button id="submit">回答確定</button></div>
+  <div><button id="clear">書き直す</button><button id="submit">回答確定</button><button id="unknown">分からない</button></div>
   <div>
     <button id="download">詳細CSV保存</button>
     <button id="downloadEvents">イベントCSV保存</button>
@@ -51,6 +52,6 @@
   </div>
   <p>自信度の回答は実験終了後に別途Googleフォームで実施します。</p>
 </section>
-<script src="script-v2.js?v=20261119-fix2"></script>
+<script src="script-v2.js?v=20261121-unknown"></script>
 </body>
 </html>
