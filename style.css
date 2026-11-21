@@ -7,3 +7,7 @@ canvas { background:white; border:3px solid black; touch-action:none; display:bl
 #info { display:none; }
 button { margin:10px; padding:10px 20px; font-size:17px; cursor:pointer; }
 @media(max-width:950px) { canvas { width:95%; height:auto; } }
+#confidenceArea { width:900px; max-width:95%; margin:20px auto; padding:24px; background:white; border-radius:10px; box-sizing:border-box; }
+.confidenceChoices { display:flex; flex-direction:column; gap:12px; align-items:flex-start; width:max-content; max-width:100%; margin:20px auto; text-align:left; }
+.confidenceChoices label { font-size:18px; padding:6px; cursor:pointer; }
+.confidenceChoices input { transform:scale(1.3); margin-right:12px; }
