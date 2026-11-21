@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>筆圧・時間計測実験</title>
-<link rel="stylesheet" href="style.css?v=20261119-fix2">
+<link rel="stylesheet" href="style.css?v=20261121-confidence15">
 </head>
 <body>
 <h1>筆圧・時間計測実験</h1>
@@ -29,6 +29,7 @@
   <button id="calibrationNext">次へ</button>
 </section>
 <section id="experimentArea" hidden>
+  <div id="writingArea">
   <div id="question">
     <h2>問題 <span id="questionProgress"></span></h2>
     <p id="questionText"></p>
@@ -50,8 +51,20 @@
     <button id="downloadStops">停止区間CSV保存</button>
     <button id="downloadSummary">集計CSV保存</button>
   </div>
-  <p>自信度の回答は実験終了後に別途Googleフォームで実施します。</p>
+  </div>
+  <section id="confidenceArea" hidden>
+    <h2>自信度アンケート（<span id="confidenceProgress"></span>）</h2>
+    <p>今書いた漢字について、どの程度自信がありますか？</p>
+    <div class="confidenceChoices">
+      <label><input type="radio" name="confidence" value="5"> 5：非常に自信がある</label>
+      <label><input type="radio" name="confidence" value="4"> 4：やや自信がある</label>
+      <label><input type="radio" name="confidence" value="3"> 3：どちらともいえない</label>
+      <label><input type="radio" name="confidence" value="2"> 2：あまり自信がない</label>
+      <label><input type="radio" name="confidence" value="1"> 1：まったく自信がない</label>
+    </div>
+    <button id="confidenceNext">次の問題へ（必須回答）</button>
+  </section>
 </section>
-<script src="script-v2.js?v=20261121-unknown"></script>
+<script src="script-v2.js?v=20261121-confidence15"></script>
 </body>
 </html>
