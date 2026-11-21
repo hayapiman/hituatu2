@@ -7,16 +7,21 @@
  * 「接触中の停止」はイベント間隔からの推定であり、思考停止の直接測定ではない。
  */
 const questions = [
-  "「しゅうかん」を漢字で書きなさい。",
-  "「かんばん」を漢字で書きなさい。",
-  "「きょうりょく」を漢字で書きなさい。",
-  "「はんだん」を漢字で書きなさい。",
-  "「かんしゃ」を漢字で書きなさい。",
-  "「けんちく」を漢字で書きなさい。",
-  "「きょうちょう」を漢字で書きなさい。",
-  "「かんしょう」を漢字で書きなさい。",
-  "「どとう」を漢字で書きなさい。",
-  "「けいさつ」を漢字で書きなさい。"
+  "毎朝運動する「しゅうかん」がある。",
+  "店の「かんばん」を新しくする。",
+  "友達と「きょうりょく」して作業する。",
+  "状況を見て「はんだん」する。",
+  "助けてくれた人に「かんしゃ」する。",
+  "新しい家を「けんちく」する。",
+  "自分の考えを「しゅちょう」する。",
+  "美術館で絵を「かんしょう」する。",
+  "「どとう」の勢いで攻め込む。",
+  "道に迷ったので「けいさつ」に尋ねる。",
+  "学問上の問題を深く「ついきゅう」する。",
+  "計画の「がいよう」を説明する。",
+  "伝統的な技術を「けいしょう」する。",
+  "意見の違いを「ちょうてい」する。",
+  "その説明は「しりめつれつ」だった。"
 ];
 
 const $ = id => document.getElementById(id);
@@ -57,6 +62,8 @@ let eventData = [];
 let stopData = [];
 let summaryData = [];
 let lastDisplayTime = 0;
+let awaitingConfidence = false;
+let confidenceShownAt = null;
 
 function elapsed(t) { return t - questionStart; }
 function nowMs() { return performance.now(); }
@@ -126,6 +133,9 @@ function displayQuestion() {
   $("questionText").textContent = questionOrder[currentQuestion].text;
   $("questionProgress").textContent =
     (currentQuestion + 1) + " / " + questionOrder.length + " 問";
+  awaitingConfidence = false;
+  $("confidenceArea").hidden = true;
+  $("writingArea").hidden = false;
   questionStart = nowMs();
   resetQuestionState();
   recordEvent("question_shown", questionStart);
@@ -146,6 +156,9 @@ function startExperiment() {
   if (orderMode === "random") questionOrder = shuffled(questionOrder);
   currentQuestion = 0;
   experimentEnded = false;
+  awaitingConfidence = false;
+  confidenceShownAt = null;
+  $("confidenceArea").hidden = true;
   experimentData = [];
   eventData = [];
   stopData = [];
@@ -284,7 +297,7 @@ function appendSample(e, t) {
   lastNormalizedPressure = normalizedPressure;
 }
 canvas.addEventListener("pointerdown", e => {
-  if (experimentEnded || e.pointerType !== INPUT_MODE || drawing) return;
+  if (experimentEnded || awaitingConfidence || e.pointerType !== INPUT_MODE || drawing) return;
   e.preventDefault();
   const t = nowMs();
   drawing = true;
@@ -346,7 +359,7 @@ canvas.addEventListener("lostpointercapture", e => {
 });
 
 $("clear").addEventListener("click", () => {
-  if (experimentEnded) return;
+  if (experimentEnded || awaitingConfidence) return;
   if (drawing) { alert("ペンを離してから書き直してください。"); return; }
   const t = nowMs();
   clearCount++;
@@ -357,13 +370,13 @@ $("clear").addEventListener("click", () => {
   lastSampleTime = null;
 });
 $("submit").addEventListener("click", () => {
-  if (experimentEnded) return;
+  if (experimentEnded || awaitingConfidence) return;
   if (drawing) { alert("ペンを離してから確定してください。"); return; }
   if (firstDownTime === null) { alert("ペンで解答を書いてください。"); return; }
   finalizeAnswer(false);
 });
 $("unknown").addEventListener("click", () => {
-  if (experimentEnded) return;
+  if (experimentEnded || awaitingConfidence) return;
   if (drawing) { alert("ペンを離してから操作してください。"); return; }
   if (firstDownTime !== null) { alert("一度でも筆記した場合は「回答確定」を押してください。"); return; }
   finalizeAnswer(true);
@@ -387,6 +400,7 @@ function finalizeAnswer(isUnknown) {
   }
   summaryData.push({
     ...questionMeta(), answerStatus: isUnknown ? "unknown" : "submitted",
+    confidence: null, confidenceTime: null,
     unknownTime: isUnknown ? t - questionStart : null,
     hasWriting: firstDownTime !== null,
     answerTime: t - questionStart,
@@ -411,10 +425,36 @@ function finalizeAnswer(isUnknown) {
     calibrationNormalPressure: normalPressure
   });
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (!isUnknown) {
+    awaitingConfidence = true;
+    $("writingArea").hidden = true;
+    $("confidenceArea").hidden = false;
+    $("confidenceProgress").textContent = (currentQuestion + 1) + " / " + questionOrder.length + " 問";
+    document.querySelectorAll('input[name="confidence"]').forEach(input => { input.checked = false; });
+    confidenceShownAt = nowMs();
+    return;
+  }
+  advanceQuestion();
+}
+$("confidenceNext").addEventListener("click", () => {
+  if (!awaitingConfidence || experimentEnded) return;
+  const selected = document.querySelector('input[name="confidence"]:checked');
+  if (!selected) { alert("自信度を選択してください。"); return; }
+  const t = nowMs();
+  const row = summaryData.at(-1);
+  row.confidence = Number(selected.value);
+  row.confidenceTime = t - confidenceShownAt;
+  recordEvent("confidence_selected", t, { confidence: row.confidence, confidenceTime: row.confidenceTime });
+  awaitingConfidence = false;
+  advanceQuestion();
+});
+function advanceQuestion() {
   currentQuestion++;
   if (currentQuestion < questionOrder.length) displayQuestion();
   else {
     experimentEnded = true;
+    $("confidenceArea").hidden = true;
+    $("writingArea").hidden = false;
     $("questionText").textContent = "実験終了。CSVを4種類保存してください。";
     $("questionProgress").textContent = "終了";
     $("submit").disabled = true;
@@ -444,12 +484,12 @@ const detailKeys = ["participant","question","questionId","questionText","orderM
   "stopTime","pointerType","buttons","penDown"];
 const eventKeys = ["participant","question","questionId","questionText","orderMode",
   "eventType","time","elapsedTime","strokeId","pointerType","x","y","pressure",
-  "clearCount","durationMs","reason"];
+  "clearCount","durationMs","reason","confidence","confidenceTime"];
 const stopKeys = ["participant","question","questionId","questionText","orderMode",
   "strokeId","stopType","startTime","endTime","startElapsedTime",
   "endElapsedTime","durationMs","reason"];
 const summaryKeys = ["participant","question","questionId","questionText","orderMode",
-  "answerStatus","unknownTime","hasWriting","answerTime","writingStartTime","writingEndToSubmitTime","firstDownTime",
+  "answerStatus","unknownTime","hasWriting","confidence","confidenceTime","answerTime","writingStartTime","writingEndToSubmitTime","firstDownTime",
   "lastUpTime","submitTime","averagePressure","maximumPressure",
   "averageNormalizedPressure","maximumNormalizedPressure","pressureStability",
   "averageSpeed","averageAcceleration","totalStopTime","stopCount","penLiftCount",
